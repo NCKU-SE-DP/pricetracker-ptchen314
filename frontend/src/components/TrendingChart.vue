@@ -17,6 +17,10 @@ export default {
     },
     mounted() {
         this.createChart(this.data);
+        window.addEventListener('resize', this.handleResize);
+    },
+    beforeUnmount() {
+        window.removeEventListener('resize', this.handleResize);
     },
     watch: {
         data(newData, oldData) {
@@ -78,6 +82,12 @@ export default {
                     },
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        }
+                    }
                 }
             });
         },
@@ -90,8 +100,13 @@ export default {
                 labels.push(`${monthDate.getFullYear()}.${monthDate.getMonth() + 1}`.padStart(2, '0'));
             }
             return labels;
-        }
+        },
 
+        handleResize() {
+            if (this.chart) {
+                this.chart.resize();
+            }
+        }
     }
 };
 </script>
@@ -101,6 +116,19 @@ export default {
     position: relative;
     margin: auto;
     height: 30vh;
-    width: 100wh;
+    width: 100%;
+    max-width: 1200px;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 50vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container {
+        height: 60vh;
+    }
 }
 </style>
