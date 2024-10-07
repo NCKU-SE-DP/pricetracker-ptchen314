@@ -3,7 +3,6 @@
         <h1>物價趨勢</h1>
         <div class="content">
             <div class="selects">
-
                 <select v-model="selectedCategory">
                     <option disabled value="">請選擇商品類別</option>
                     <option v-for="category in categoryKeys" :key="category" :value="category">{{
@@ -77,7 +76,7 @@ export default {
 
 <style scoped>
 .wrapper {
-    padding: 3em 5em;
+    padding: 2em;
     background: #f3f3f3;
     min-height: calc(100vh - 4.5em);
     height: calc(100% - 4.5em);
@@ -86,33 +85,66 @@ export default {
 }
 
 .content {
-    margin-top: 2em;
+    margin-top: 1.5em;
     background-color: #fff;
     border-radius: 1em;
-    padding: 2em;
+    padding: 1.5em;
     width: 100%;
 }
 
-
 .selects {
     display: flex;
-    justify-content: flex-start;
+    flex-direction: column;
+    gap: 1em;
 }
 
-.selects>select {
+.selects > select {
     padding: .5em;
-    font-size: 1.1em;
-    margin-right: 1em;
+    font-size: 1em;
     border-radius: .5em;
     border: 1px solid #ccc;
     outline: none;
     cursor: pointer;
     appearance: auto !important;
+    width: 100%;
+}
+
+.visualize {
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    margin-top: 2em;
 }
 
 .visualize > * {
-    flex: 1 1 50%;
-    box-sizing: border-box;
-    padding: 1em;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .wrapper {
+        padding: 3em 5em;
+    }
+
+    .content {
+        padding: 2em;
+    }
+
+    .selects {
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+
+    .selects > select {
+        width: auto;
+        margin-right: 1em;
+    }
+
+    .visualize {
+        flex-direction: row;
+    }
+
+    .visualize > * {
+        flex: 1 1 50%;
+    }
 }
 </style>
