@@ -1,23 +1,25 @@
 <template>
     <div class="trending-table">
-        <table>
-            <thead>
-                <tr>
-                    <th rowspan="2">年份</th>
-                    <th v-for="month in months" :key="month">{{ month }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template v-for="year in years" :key="year">
+        <div class="table-wrapper">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ year }}</td>
-                        <template v-for="(value, monthIndex) in getYearData(year)" :key="year + '-month-' + monthIndex">
-                            <td>{{ valueDisplay(value) }}</td>
-                        </template>
+                        <th rowspan="2">年份</th>
+                        <th v-for="month in months" :key="month">{{ month }}</th>
                     </tr>
-                </template>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <template v-for="year in years" :key="year">
+                        <tr>
+                            <td>{{ year }}</td>
+                            <template v-for="(value, monthIndex) in getYearData(year)" :key="year + '-month-' + monthIndex">
+                                <td>{{ valueDisplay(value) }}</td>
+                            </template>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
@@ -36,7 +38,7 @@ export default {
     },
     computed: {
         months() {
-            return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
         },
         years() {
             const startYear = new Date(this.data.時間起點).getFullYear();
@@ -95,6 +97,12 @@ export default {
 <style scoped>
 .trending-table {
     margin-top: 2em;
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table-wrapper {
+    min-width: 800px;
 }
 
 table {
@@ -107,5 +115,27 @@ td {
     border: 1px solid #ccc;
     padding: 0.5em;
     text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+    .trending-table {
+        font-size: 14px;
+    }
+
+    th,
+    td {
+        padding: 0.3em;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .trending-table {
+        font-size: 12px;
+    }
+
+    th,
+    td {
+        padding: 0.2em;
+    }
 }
 </style>
