@@ -310,7 +310,8 @@ async def login_for_access_token(
         form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(session_opener)
 ):
     """login"""
-    user = authenticate_user(db, form_data.username, form_data.password) ##orig user = check_user_password_is_correct(db, form_data.username, form_data.password)
+
+    user = check_user_password_is_correct(db, form_data.username, form_data.password) ##orig user = check_user_password_is_correct(db, form_data.username, form_data.password)
     access_token = create_access_token(
         data={"sub": str(user.username)}, expires_delta=timedelta(minutes=30)
     )
