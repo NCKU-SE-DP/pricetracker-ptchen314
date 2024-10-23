@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from typing import List, Optional
 import requests
 from fastapi import APIRouter, HTTPException, Query, Depends, status, FastAPI
+import os
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -18,15 +19,6 @@ from sqlalchemy import (Column, ForeignKey, Integer, String, Table, Text,
                         create_engine)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-
-##open ai import
-import os
-from openai import OpenAI
-
-from urllib.parse import quote
-import requests
-from bs4 import BeautifulSoup
-
 
 Base = declarative_base()
 
@@ -93,6 +85,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+from openai import OpenAI
 
 
 # def generate_summary(content):
@@ -127,7 +121,10 @@ app.add_middleware(
 #     return completion.choices[0].message.content
 
 
-
+from urllib.parse import quote
+import requests
+from bs4 import BeautifulSoup
+from sqlalchemy.orm import Session
 
 
 def add_new(news_data):
@@ -195,7 +192,7 @@ def get_new(is_initial=False):
     news_data = get_new_info("價格", is_initial=is_initial)
     for news in news_data:
         title = news["title"]
-        msg = [
+        m = [
             {
                 "role": "system",
                 "content": "你是一個關聯度評估機器人，請評估新聞標題是否與「民生用品的價格變化」相關，並給予'high'、'medium'、'low'評價。(僅需回答'high'、'medium'、'low'三個詞之一)",
@@ -204,7 +201,7 @@ def get_new(is_initial=False):
         ]
         ai = OpenAI(api_key="xxx").chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=msg,
+            messages=m,
         )
         relevance = ai.choices[0].message.content
         if relevance == "high":
@@ -227,7 +224,7 @@ def get_new(is_initial=False):
                 "time": time,
                 "content": paragraphs,
             }
-            msg = [
+            m = [
                 {
                     "role": "system",
                     "content": "你是一個新聞摘要生成機器人，請統整新聞中提及的影響及主要原因 (影響、原因各50個字，請以json格式回答 {'影響': '...', '原因': '...'})",
@@ -237,7 +234,7 @@ def get_new(is_initial=False):
 
             completion = OpenAI(api_key="xxx").chat.completions.create(
                 model="gpt-3.5-turbo",
-                messages=msg,
+                messages=m,
             )
             result = completion.choices[0].message.content
             result = json.loads(result)
@@ -275,16 +272,18 @@ def session_opener():
 
 
 
-def verify_password(p1, p2):##def verify(p1, p2):
+def verify(p1, p2):
     return pwd_context.verify(p1, p2)
 
-def check_user_password_is_correct(db, n, pwd):
-    dbCheck = db.query(User).filter(User.username == n).first()
-    if not verify_password(pwd, dbCheck.hashed_password):
-        return False
-    return dbCheck
 
-def authenticate_user(  ## def authenticate_user_token(
+def check_user_password_is_correct(db, n, pwd):
+    OuO = db.query(User).filter(User.username == n).first()
+    if not verify(pwd, OuO.hashed_password):
+        return False
+    return OuO
+
+
+def authenticate_user_token(
     token = Depends(oauth2_scheme),
     db = Depends(session_opener)
 ):
@@ -310,7 +309,7 @@ async def login_for_access_token(
         form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(session_opener)
 ):
     """login"""
-    user = check_user_password_is_correct(db, form_data.username, form_data.password) ##orig user = check_user_password_is_correct(db, form_data.username, form_data.password)
+    user = check_user_password_is_correct(db, form_data.username, form_data.password)
     access_token = create_access_token(
         data={"sub": str(user.username)}, expires_delta=timedelta(minutes=30)
     )
@@ -331,7 +330,7 @@ def create_user(user: UserAuthSchema, db: Session = Depends(session_opener)):
 
 
 @app.get("/api/v1/users/me")
-def read_users_me(user=Depends(authenticate_user)): ##orig read_users_me(user=Depends(authenticate_user_token)):
+def read_users_me(user=Depends(authenticate_user_token)):
     return {"username": user.username}
 
 
@@ -378,7 +377,7 @@ def read_news(db=Depends(session_opener)):
 )
 def read_user_news(
         db=Depends(session_opener),
-        userDetect=Depends(authenticate_user) ##orig u=Depends(authenticate_user_token)
+        u=Depends(authenticate_user_token)
 ):
     """
     read user new
@@ -390,7 +389,7 @@ def read_user_news(
     news = db.query(NewsArticle).order_by(NewsArticle.time.desc()).all()
     result = []
     for article in news:
-        upvotes, upvoted = get_article_upvote_details(article.id, userDetect.id, db)
+        upvotes, upvoted = get_article_upvote_details(article.id, u.id, db)
         result.append(
             {
                 **article.__dict__,
@@ -407,7 +406,7 @@ class PromptRequest(BaseModel):
 async def search_news(request: PromptRequest):
     prompt = request.prompt
     news_list = []
-    msg = [
+    m = [
         {
             "role": "system",
             "content": "你是一個關鍵字提取機器人，用戶將會輸入一段文字，表示其希望看見的新聞內容，請提取出用戶希望看見的關鍵字，請截取最重要的關鍵字即可，避免出現「新聞」、「資訊」等混淆搜尋引擎的字詞。(僅須回答關鍵字，若有多個關鍵字，請以空格分隔)",
@@ -417,7 +416,7 @@ async def search_news(request: PromptRequest):
 
     completion = OpenAI(api_key="xxx").chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=msg,
+        messages=m,
     )
     keywords = completion.choices[0].message.content
     # should change into simple factory pattern
@@ -455,9 +454,10 @@ class NewsSumaryRequestSchema(BaseModel):
 
 @app.post("/api/v1/news/news_summary")
 async def news_summary(
-        payload: NewsSumaryRequestSchema, userDetect=Depends(authenticate_user)):##orig  payload: NewsSumaryRequestSchema, u=Depends(authenticate_user_token)
+        payload: NewsSumaryRequestSchema, u=Depends(authenticate_user_token)
+):
     response = {}
-    msg = [
+    m = [
         {
             "role": "system",
             "content": "你是一個新聞摘要生成機器人，請統整新聞中提及的影響及主要原因 (影響、原因各50個字，請以json格式回答 {'影響': '...', '原因': '...'})",
@@ -467,7 +467,7 @@ async def news_summary(
 
     completion = OpenAI(api_key="xxx").chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=msg,
+        messages=m,
     )
     result = completion.choices[0].message.content
     if result:
@@ -481,9 +481,9 @@ async def news_summary(
 def upvote_article(
         id,
         db=Depends(session_opener),
-        userDetect=Depends(authenticate_user)##=Depends(authenticate_user_token),
+        u=Depends(authenticate_user_token),
 ):
-    message = toggle_upvote(id, userDetect.id, db)
+    message = toggle_upvote(id, u.id, db)
     return {"message": message}
 
 
