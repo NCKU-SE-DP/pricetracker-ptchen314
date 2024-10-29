@@ -1,3 +1,10 @@
 .pytest_cache
 __pycache__
 .env
+/backend/bin
+/backend/include
+backend/Examples.md
+/backend/lib
+backend/orig_main.py
+backend/PULL_REQUEST.md
+backend/pyvenv.cfg
