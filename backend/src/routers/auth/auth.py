@@ -3,11 +3,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 
-from src.dependencies import get_db, get_current_user
-from src.models import User
-from src.services import AuthService
-from src.schemas import UserAuthSchema, Token, UserResponse
-from src.config import settings
+from dependencies import get_db, get_current_user
+from models import User
+from services import AuthService
+from schemas import UserAuthSchema, Token, UserResponse
+from config import settings
 
 router = APIRouter(
     prefix="/api/v1/users",
