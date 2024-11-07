@@ -6,10 +6,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from src.config import settings
 from src.models import Base, NewsArticle
 from src.database import engine, SessionLocal
-from src.routers.auth import auth
-from src.routers.news import news
+from src.auth import auth
+from src.news import news
 from src.services import NewsService
-from src.routers.prices import prices
+from src.prices import prices
 
 # 初始化資料庫
 Base.metadata.create_all(bind=engine)
