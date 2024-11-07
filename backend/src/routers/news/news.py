@@ -5,10 +5,10 @@ import itertools
 import requests
 from bs4 import BeautifulSoup
 
-from dependencies import get_db, get_current_user
-from models import User, NewsArticle
-from services import NewsService, AIService
-from schemas import (
+from .dependencies import get_db, get_current_user
+from .models import User, NewsArticle
+from .services import NewsService, AIService
+from .schemas import (
     NewsResponse,
     NewsSearchResponse,
     NewsSumaryRequestSchema,

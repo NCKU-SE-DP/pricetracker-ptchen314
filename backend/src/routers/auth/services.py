@@ -10,9 +10,9 @@ from openai import OpenAI
 from urllib.parse import quote
 from sqlalchemy import select, delete, insert
 
-from models import User, NewsArticle
-from config import settings
-from schemas import UserAuthSchema
+from .models import User, NewsArticle
+from .config import settings
+from .schemas import UserAuthSchema
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
