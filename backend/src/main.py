@@ -9,6 +9,7 @@ from auth import routes as auth_router
 from news import routes as news_router
 from prices import routes as prices_router
 from news import news
+from crawlers.udn_crawler import UDNCrawler
 
 # Initialize database
 Base.metadata.create_all(bind=engine)
@@ -42,11 +43,15 @@ async def startup_event():
     # Initialize news database if empty
     db = SessionLocal()
     if db.query(NewsArticle).count() == 0:
-        await news.get_new(db)
+        crawler = UDNCrawler()
+        headlines = await crawler.get_headline("", 1)
+        for headline in headlines:
+            news = await crawler.validate_and_parse(headline.url)
+            crawler.save(news, db)
     db.close()
     
     # Start scheduler
-    scheduler.add_job(news.get_new, "interval", minutes=100)
+    scheduler.add_job(startup_event, "interval", minutes=100)
     scheduler.start()
 
 @app.on_event("shutdown")
