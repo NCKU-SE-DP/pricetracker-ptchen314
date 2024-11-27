@@ -29,10 +29,29 @@ class News(Headline):
     )
 
 class NewsCrawlerBase(metaclass=abc.ABCMeta):
+    news_website_url: AnyHttpUrl | str
+    news_website_news_child_urls: list[AnyHttpUrl | str]
+
     @abc.abstractmethod
-    def get_headline(self, search_term: str, page: int | tuple[int, int]) -> list[Headline]:
+    async def get_headline(
+            self, search_term: str, page: int | tuple[int, int]
+    ) -> list[Headline]:
+        """Get news headlines from the website"""
         pass
 
     @abc.abstractmethod
-    def parse(self, url: AnyHttpUrl | str) -> News:
+    async def parse(self, url: AnyHttpUrl | str) -> News:
+        """Parse news content from the given URL"""
         pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def save(news: News, db: Session | None):
+        """Save news to database"""
+        pass
+
+    def _is_valid_url(self, url: AnyHttpUrl | str) -> bool:
+        """Check if URL belongs to the news website"""
+        main_domain = tldextract.extract(self.news_website_url).registered_domain
+        url_domain = tldextract.extract(str(url)).registered_domain
+        return url_domain == main_domain
