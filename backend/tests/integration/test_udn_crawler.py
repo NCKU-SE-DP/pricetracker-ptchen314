@@ -5,7 +5,7 @@ import pytest
 from bs4 import BeautifulSoup
 from pydantic import AnyHttpUrl
 
-# 修改導入路徑，使用相對導入
+# 修改導入路徑，使用絕對導入
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
