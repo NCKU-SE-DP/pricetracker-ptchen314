@@ -5,8 +5,8 @@ from typing import List
 from sqlalchemy.orm import Session
 from pydantic import AnyHttpUrl
 
-from ..models import NewsArticle
-from .base import NewsCrawlerBase, News, Headline
+from models import NewsArticle
+from base import NewsCrawlerBase, News, Headline
 
 async def get_news_list(search_term: str = "", page: int = 1) -> List[Headline]:
     """獲取聯合新聞網的新聞列表"""
