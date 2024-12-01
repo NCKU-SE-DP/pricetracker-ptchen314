@@ -1,13 +1,20 @@
 import unittest
 from unittest.mock import MagicMock, patch
 from datetime import datetime
+import pytest
 from bs4 import BeautifulSoup
 from pydantic import AnyHttpUrl
+
+# 修改導入路徑，使用相對導入
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from src.crawlers.udn_crawler import UDNCrawler
 from src.crawlers.base import News, Headline
 from src.models import NewsArticle
 
+@pytest.mark.asyncio
 class TestUDNCrawler(unittest.TestCase):
     def setUp(self):
         self.crawler = UDNCrawler()
@@ -27,9 +34,8 @@ class TestUDNCrawler(unittest.TestCase):
 
     @patch('aiohttp.ClientSession')
     async def test_get_headline(self, mock_session):
-        # 設置 mock response
         mock_response = MagicMock()
-        mock_response.text = self.mock_html
+        mock_response.text.return_value = self.mock_html
         mock_session.return_value.__aenter__.return_value.get.return_value.__aenter__.return_value = mock_response
 
         headlines = await self.crawler.get_headline(search_term="", page=1)
@@ -40,9 +46,8 @@ class TestUDNCrawler(unittest.TestCase):
 
     @patch('aiohttp.ClientSession')
     async def test_parse(self, mock_session):
-        # 設置 mock response
         mock_response = MagicMock()
-        mock_response.text = self.mock_article_html
+        mock_response.text.return_value = self.mock_article_html
         mock_session.return_value.__aenter__.return_value.get.return_value.__aenter__.return_value = mock_response
 
         url = "https://udn.com/news/story/1"
@@ -51,15 +56,10 @@ class TestUDNCrawler(unittest.TestCase):
         self.assertEqual(news.title, "測試新聞標題")
         self.assertEqual(news.url, url)
         self.assertEqual(news.content, "這是測試新聞內容")
-        
-        # 檢查時間格式是否正確
-        datetime.fromisoformat(news.time)  # 如果格式不正確會拋出異常
+        datetime.fromisoformat(news.time)
 
     def test_save(self):
-        # 創建 mock Session
         mock_db = MagicMock()
-        
-        # 創建測試新聞
         test_news = News(
             title="測試新聞標題",
             url="https://udn.com/news/story/1",
@@ -67,14 +67,11 @@ class TestUDNCrawler(unittest.TestCase):
             content="這是測試新聞內容"
         )
         
-        # 執行儲存
         self.crawler.save(test_news, mock_db)
         
-        # 驗證是否正確呼叫了 add 和 commit
         mock_db.add.assert_called_once()
         mock_db.commit.assert_called_once()
         
-        # 驗證傳入 add 的參數是否正確
         added_article = mock_db.add.call_args[0][0]
         self.assertIsInstance(added_article, NewsArticle)
         self.assertEqual(added_article.title, "測試新聞標題")
