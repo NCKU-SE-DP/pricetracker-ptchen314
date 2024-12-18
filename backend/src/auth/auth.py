@@ -26,17 +26,14 @@ async def login_for_access_token(
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="帳號或密碼錯誤",
-                headers={"WWW-Authenticate": "Bearer", "server": "Pricetracker-API"},
+                headers={"WWW-Authenticate": "Bearer"},
             )
         access_token = create_access_token(
             data={"sub": user.username},
             expires_delta=timedelta(minutes=30)
         )
         logger.info(f"Successful login for user: {form_data.username}")
-        return JSONResponse(
-            content={"access_token": access_token, "token_type": "bearer"},
-            headers={"server": "Pricetracker-API"}
-        )
+        return {"access_token": access_token, "token_type": "bearer"}
     except Exception as e:
         logger.error(f"Login error for user {form_data.username}: {str(e)}")
         raise
@@ -50,8 +47,7 @@ def create_user(user: UserAuthSchema, db: Session = Depends(get_db)):
             logger.warning(f"Registration failed - username already exists: {user.username}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="使用者名稱已被註冊",
-                headers={"server": "Pricetracker-API"}
+                detail="使用者名稱已被註冊"
             )
         hashed_password = get_password_hash(user.password)
         db_user = User(username=user.username, hashed_password=hashed_password)
@@ -59,10 +55,7 @@ def create_user(user: UserAuthSchema, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_user)
         logger.info(f"Successfully registered new user: {user.username}")
-        return JSONResponse(
-            content=db_user.__dict__,
-            headers={"server": "Pricetracker-API"}
-        )
+        return db_user
     except Exception as e:
         logger.error(f"Registration error for {user.username}: {str(e)}")
         raise
@@ -71,10 +64,7 @@ def create_user(user: UserAuthSchema, db: Session = Depends(get_db)):
 def read_users_me(current_user: User = Depends(get_current_user)):
     try:
         logger.info(f"Profile access for user: {current_user.username}")
-        return JSONResponse(
-            content={"username": current_user.username},
-            headers={"server": "Pricetracker-API"}
-        )
+        return {"username": current_user.username}
     except Exception as e:
         logger.error(f"Profile access error for {current_user.username}: {str(e)}")
         raise 

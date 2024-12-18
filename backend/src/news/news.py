@@ -40,16 +40,12 @@ def read_news(db: Session = Depends(get_db)):
                 "is_upvoted": upvoted
             }
             result.append(article_dict)
-        return JSONResponse(
-            content=result,
-            headers={"server": "Pricetracker-API"}
-        )
+        return result
     except Exception as e:
         logger.error(f"Error fetching news: {str(e)}")
         raise HTTPException(
             status_code=500,
-            detail="獲取新聞失敗",
-            headers={"server": "Pricetracker-API"}
+            detail="獲取新聞失敗"
         )
 
 @router.get("/user_news", response_model=List[NewsResponse])
@@ -195,7 +191,7 @@ def news_summary_custom_model(
             messages=[
                 {
                     "role": "system",
-                    "content": "你是一個新聞摘要生成機器人，請統整新��中提及的影響及主要原因 (影響、原因各50個字，無論有無回復，都請以json格式回答 {\"影響\": \"...\", \"原因\": \"...\"})",
+                    "content": "你是一個新聞摘要生成機器人，請統整新聞中提及的影響及主要原因 (影響、原因各50個字，無論有無回復，都請以json格式回答 {\"影響\": \"...\", \"原因\": \"...\"})",
                 },
                 {
                     "role": "user",

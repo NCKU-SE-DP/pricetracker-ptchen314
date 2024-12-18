@@ -25,7 +25,6 @@ def get_necessities_prices(
         logger.error(f"API request failed: {str(e)}")
         raise HTTPException(
             status_code=503,
-            headers={"server":"HaH-API-Core"},
             detail="無法連接到價格資料服務"
         )
     except Exception as e:
