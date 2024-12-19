@@ -28,7 +28,8 @@ def get_news_list(search_term: str, is_initial: bool = False) -> list:
             if is_initial:
                 all_news_data.extend(response.json()["lists"])
             else:
-                all_news_data = response.json()["lists"]
+                all_news_data.extend(response.json()["lists"])
+
                 
         return all_news_data
         
@@ -37,7 +38,8 @@ def get_news_list(search_term: str, is_initial: bool = False) -> list:
     except (KeyError, ValueError) as e:
         raise ParseError(f"解析新聞列表失敗: {str(e)}")
 
-def get_article_content(url: str) -> tuple:
+def get_article_content(url: str) -> dict:
+
     """獲取文章內容"""
     try:
         response = requests.get(url)
@@ -47,26 +49,38 @@ def get_article_content(url: str) -> tuple:
         title = soup.find("h1", class_="article-content__title")
         if not title:
             raise ParseError("找不到文章標題")
-        title = title.text
+        title = title.text.strip()
+
         
         time = soup.find("time", class_="article-content__time")
         if not time:
             raise ParseError("找不到文章時間")
-        time = time.text
+        time = time.text.strip()
+
         
         content_section = soup.find("section", class_="article-content__editor")
         if not content_section:
             raise ParseError("找不到文章內容區塊")
         
         paragraphs = [
-            p.text
+            p.text.strip()
+
             for p in content_section.find_all("p")
             if p.text.strip() != "" and "▪" not in p.text
         ]
         
-        return title, time, paragraphs
+        content = " ".join(paragraphs)
+        
+        return {
+            "url": url,
+            "title": title,
+            "time": time,
+            "content": content
+        }
         
     except requests.RequestException as e:
         raise NetworkError(f"獲取文章內容失敗: {str(e)}")
+    except ParseError as e:
+        raise e
     except Exception as e:
         raise ParseError(f"解析文章內容失敗: {str(e)}")

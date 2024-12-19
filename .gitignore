@@ -18,3 +18,7 @@ lastpt.md
 pr.md
 backend/.coverage
 backend/coverage.xml
+/backend/.venv
+backend/coverage.xml
+backend/.coverage
+backend/.coverage

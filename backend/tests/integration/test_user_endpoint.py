@@ -2,14 +2,21 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, StaticPool
 from sqlalchemy.orm import sessionmaker
-from main import app
-from main import Base, User, session_opener
+import sys
+import os
+
+# 添加測試配置到 Python 路徑
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from config import settings
+
+from src.main import app
+from src.models import Base, User
+from src.database import get_db
 from jose import jwt
-from main import pwd_context
+from src.auth.models import pwd_context
 
 SECRET_KEY = "1892dhianiandowqd0n"
 ALGORITHM = "HS256"
-# SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, poolclass=StaticPool)
 
@@ -17,22 +24,20 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 Base.metadata.create_all(bind=engine)
 
-
-def override_session_opener():
+def override_get_db():
     try:
         db = TestingSessionLocal()
         yield db
     finally:
         db.close()
 
-
-app.dependency_overrides[session_opener] = override_session_opener
+app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
 @pytest.fixture(scope="module")
 def clear_users():
-    with next(override_session_opener()) as db:
+    with next(override_get_db()) as db:
         db.query(User).delete()
         db.commit()
 
@@ -40,7 +45,7 @@ def clear_users():
 def test_user(clear_users):
     hashed_password = pwd_context.hash("testpassword")
 
-    with next(override_session_opener()) as db:
+    with next(override_get_db()) as db:
         user = User(username="testuser", hashed_password=hashed_password)
         db.add(user)
         db.commit()

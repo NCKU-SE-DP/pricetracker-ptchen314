@@ -48,7 +48,6 @@ class TestUDNCrawler(unittest.TestCase):
             
     @patch('src.crawler.udn_crawler.requests.get')
     def test_get_article_content_success(self, mock_get):
-        # 模擬成功的HTML回應
         mock_response = Mock()
         mock_response.text = """
         <html>
@@ -62,12 +61,11 @@ class TestUDNCrawler(unittest.TestCase):
         """
         mock_get.return_value = mock_response
         
-        title, time, paragraphs = udn_crawler.get_article_content(self.test_url)
+        result = udn_crawler.get_article_content(self.test_url)
         
-        self.assertEqual(title, "測試標題")
-        self.assertEqual(time, "2024-01-01 12:00")
-        self.assertEqual(len(paragraphs), 2)
-        self.assertEqual(paragraphs[0], "段落1")
+        assert result["title"] == "測試標題"
+        assert result["time"] == "2024-01-01 12:00"
+        assert result["content"] == "段落1 段落2"
         
     @patch('src.crawler.udn_crawler.requests.get')
     def test_get_article_content_network_error(self, mock_get):

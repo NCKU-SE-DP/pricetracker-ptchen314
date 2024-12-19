@@ -17,7 +17,12 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - MODULE_NAME=app.main
-      - VARIABLE_NAME=app
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+      - MODULE_NAME=src.main
+      - VARIABLE_NAME=src
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL}
+      - SENTRY_DSN=${SENTRY_DSN}
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 

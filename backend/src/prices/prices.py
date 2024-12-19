@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 import requests
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1/prices", tags=["prices"])
 
 @router.get("/necessities-price")
 def get_necessities_prices(

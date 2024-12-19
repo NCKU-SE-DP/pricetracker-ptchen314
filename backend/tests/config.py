@@ -1,9 +1,6 @@
 from pydantic_settings import BaseSettings
 import os 
 
-
-
-
 class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///news_database.db"
     SECRET_KEY: str = "1892dhianiandowqd0n"

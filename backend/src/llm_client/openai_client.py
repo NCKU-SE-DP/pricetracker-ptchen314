@@ -1,6 +1,7 @@
 from typing import List, Optional, Dict, Any
-from openai import AsyncOpenAI
+import aisuite as ai
 from .base import LLMClientProtocol
+from src.config import settings
 
 def create_openai_client(api_key: str) -> LLMClientProtocol:
     """
@@ -12,13 +13,12 @@ def create_openai_client(api_key: str) -> LLMClientProtocol:
     Returns:
         符合 LLMClientProtocol 的客戶端
     """
-    client = AsyncOpenAI(api_key=api_key)
-
+    client = ai.Client()
     class OpenAIClientImpl:
-        async def chat_completion(
+        def chat_completion(
             self,
             messages: List[Dict[str, str]],
-            model: str = "gpt-3.5-turbo",
+            model: str = f"openai:{settings.OPENAI_MODEL}",
             temperature: float = 0.7,
             max_tokens: Optional[int] = None,
             **kwargs: Any
@@ -27,7 +27,7 @@ def create_openai_client(api_key: str) -> LLMClientProtocol:
             使用 OpenAI 的 Chat API 執行對話完成。
             """
             try:
-                response = await client.chat.completions.create(
+                response = client.chat.completions.create(
                     model=model,
                     messages=messages,
                     temperature=temperature,
@@ -46,50 +46,13 @@ def create_openai_client(api_key: str) -> LLMClientProtocol:
                     }
                 }
             except Exception as e:
-                raise Exception(f"OpenAI Chat 完成請求失敗: {str(e)}")
-
-        async def embeddings(
-            self,
-            texts: List[str],
-            model: str = "text-embedding-ada-002",
-            **kwargs: Any
-        ) -> List[List[float]]:
+                  raise Exception(f"OpenAI 請求失敗: {str(e)}")
+        
+        def embeddings(self, input: List[str], model: str = "text-embedding-ada-002") -> List[float]:
             """
-            使用 OpenAI 的 Embedding API 生成文本嵌入。
+            使用 OpenAI 的 Embeddings API 生成文本嵌入。
             """
-            try:
-                response = await client.embeddings.create(
-                    model=model,
-                    input=texts,
-                    **kwargs
-                )
-                return [data.embedding for data in response.data]
-            except Exception as e:
-                raise Exception(f"OpenAI Embedding 請求失敗: {str(e)}")
-
-        async def moderation(
-            self,
-            texts: List[str],
-            model: Optional[str] = "text-moderation-latest",
-            **kwargs: Any
-        ) -> Dict[str, Any]:
-            """
-            使用 OpenAI 的 Moderation API 執行內容審核。
-            """
-            try:
-                response = await client.moderations.create(
-                    input=texts,
-                    model=model,
-                    **kwargs
-                )
-                return {
-                    "results": [{
-                        "flagged": result.flagged,
-                        "categories": result.categories,
-                        "category_scores": result.category_scores
-                    } for result in response.results]
-                }
-            except Exception as e:
-                raise Exception(f"OpenAI Moderation 請求失敗: {str(e)}")
+            response = client.embeddings.create(input=input, model=model)
+            return response.data[0].embedding
 
     return OpenAIClientImpl()
