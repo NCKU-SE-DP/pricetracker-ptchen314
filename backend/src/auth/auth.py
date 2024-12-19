@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 import logging
+
 from src.models import User
 from src.database import get_db
 from src.auth.models import authenticate_user, create_access_token, get_password_hash, get_current_user
@@ -68,3 +69,4 @@ def read_users_me(current_user: User = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Profile access error for {current_user.username}: {str(e)}")
         raise 
+

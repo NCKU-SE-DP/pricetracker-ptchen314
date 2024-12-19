@@ -10,6 +10,7 @@ from typing import List, Optional
 from fastapi.responses import JSONResponse
 import logging
 
+
 from src.models import NewsArticle, user_news_association_table, User
 from src.news.models import get_article_upvote_details
 from src.news.schemas import NewsResponse, PromptRequest, NewsSummaryRequest
@@ -47,6 +48,7 @@ def read_news(db: Session = Depends(get_db)):
             status_code=500,
             detail="獲取新聞失敗"
         )
+
 
 @router.get("/user_news", response_model=List[NewsResponse])
 def read_user_news(

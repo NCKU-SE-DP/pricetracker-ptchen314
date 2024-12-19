@@ -38,6 +38,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="無法驗證憑證",
+
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:

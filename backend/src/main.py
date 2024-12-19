@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 import sentry_sdk
 from apscheduler.schedulers.background import BackgroundScheduler
 import logging
+
 from src.config import settings
 from src.database import engine, Base, SessionLocal
 from src.models import NewsArticle
@@ -19,6 +20,7 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
 
 # Initialize database
 Base.metadata.create_all(bind=engine)
@@ -98,6 +100,7 @@ async def scheduled_news_update():
         logger.info("Completed scheduled news update")
     except Exception as e:
         logger.error(f"Error in scheduled news update: {str(e)}", exc_info=True)
+
     finally:
         db.close()
 
@@ -112,6 +115,7 @@ async def startup_event():
             get_new(db, is_initial=True)
     except Exception as e:
         logger.error(f"Error during startup: {str(e)}", exc_info=True)
+
     finally:
         db.close()
     
@@ -122,6 +126,7 @@ async def startup_event():
         logger.info("Scheduler started successfully")
     except Exception as e:
         logger.error(f"Error starting scheduler: {str(e)}", exc_info=True)
+
 
 @app.on_event("shutdown")
 def shutdown_event():

@@ -3,6 +3,7 @@ import requests
 import logging
 
 logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/api/v1/prices", tags=["prices"])
 
 @router.get("/necessities-price")

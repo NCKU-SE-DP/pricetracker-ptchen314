@@ -4,6 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from src.config import settings
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 try:

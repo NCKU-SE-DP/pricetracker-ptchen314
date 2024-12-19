@@ -20,4 +20,6 @@ EXPOSE 8000
 ENV PYTHONPATH=/app
 
 # 使用 uvicorn 運行 fastapi 應用
+
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-server-header", "--header", "server:Pricetracker-API"]
+
