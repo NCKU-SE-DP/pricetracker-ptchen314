@@ -7,7 +7,8 @@ from pydantic import BaseModel
 from sqlalchemy import delete, insert, select
 from sqlalchemy.orm import Session
 from typing import List, Optional
-
+from fastapi.responses import JSONResponse
+import logging
 
 
 from src.models import NewsArticle, user_news_association_table, User
@@ -23,22 +24,31 @@ openai_client = openai_client.create_openai_client(settings.OPENAI_API_KEY)
 anthropic_client = anthropic_client.create_anthropic_client(settings.ANTHROPIC_API_KEY)
 router = APIRouter(prefix="/api/v1/news", tags=["news"])
 _id_counter = itertools.count(start=1000000)
+logger = logging.getLogger(__name__)
 
 
 @router.get("/news", response_model=List[NewsResponse])
 def read_news(db: Session = Depends(get_db)):
     """獲取所有新聞"""
-    news = db.query(NewsArticle).order_by(NewsArticle.time.desc()).all()
-    result = []
-    for article in news:
-        upvotes, upvoted = get_article_upvote_details(article.id, None, db)
-        article_dict = {
-            **article.__dict__,
-            "upvotes": upvotes,
-            "is_upvoted": upvoted
-        }
-        result.append(article_dict)
-    return result
+    try:
+        news = db.query(NewsArticle).order_by(NewsArticle.time.desc()).all()
+        result = []
+        for article in news:
+            upvotes, upvoted = get_article_upvote_details(article.id, None, db)
+            article_dict = {
+                **article.__dict__,
+                "upvotes": upvotes,
+                "is_upvoted": upvoted
+            }
+            result.append(article_dict)
+        return result
+    except Exception as e:
+        logger.error(f"Error fetching news: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="獲取新聞失敗"
+        )
+
 
 @router.get("/user_news", response_model=List[NewsResponse])
 def read_user_news(
