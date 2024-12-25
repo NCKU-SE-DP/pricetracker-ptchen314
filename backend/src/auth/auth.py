@@ -79,6 +79,7 @@ async def login_for_access_token(
             }
         )
 
+
 @router.post("/register")
 def create_user(user: UserAuthSchema, db: Session = Depends(get_db)):
     try:

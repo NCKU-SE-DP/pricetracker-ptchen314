@@ -5,6 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError, OperationalError, DatabaseError
 from fastapi import HTTPException, status
 import logging
 from src.config import settings
+import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +45,7 @@ except Exception as e:
             "detail": str(e)
         }
     )
+
 
 def get_db():
     db = SessionLocal()

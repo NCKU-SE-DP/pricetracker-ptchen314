@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 import logging
 from fastapi import status
 from sqlalchemy.exc import SQLAlchemyError
+
 from src.models import NewsArticle, user_news_association_table, User
 from src.news.models import get_article_upvote_details
 from src.news.schemas import NewsResponse, PromptRequest, NewsSummaryRequest
@@ -73,6 +74,7 @@ def read_news(db: Session = Depends(get_db)):
                 "message": "獲取新聞時發生未預期的錯誤",
                 "detail": str(e)
             }
+
         )
 
 

@@ -4,6 +4,7 @@ import logging
 from fastapi.responses import JSONResponse
 from fastapi import status
 
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/prices", tags=["prices"])
@@ -84,4 +85,5 @@ def get_necessities_prices(
                 "message": "獲取價格資料時發生未預期的錯誤",
                 "detail": str(e)
             }
+
         ) 

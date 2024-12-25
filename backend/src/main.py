@@ -56,6 +56,7 @@ async def bruh_general_exception_handler(request: Request, exc: Exception):
             "detail": str(exc),
             "path": str(request.url)
         }
+
     )
 
 @app.exception_handler(ValueError)
@@ -69,6 +70,7 @@ async def bruh_value_error_handler(request: Request, exc: ValueError):
             "detail": str(exc),
             "path": str(request.url)
         }
+
     )
 
 @app.exception_handler(KeyError)
@@ -82,6 +84,7 @@ async def bruh_key_error_handler(request: Request, exc: KeyError):
             "detail": str(exc),
             "path": str(request.url)
         }
+
     )
 
 @app.exception_handler(TypeError)
@@ -95,6 +98,7 @@ async def bruh_type_error_handler(request: Request, exc: TypeError):
             "detail": str(exc),
             "path": str(request.url)
         }
+
     )
 
 # Database error handler
@@ -110,6 +114,7 @@ async def bruh_database_error_handler(request: Request, exc: SQLAlchemyError):
             "detail": str(exc),
             "path": str(request.url)
         }
+
     )
 
 # Register routers
