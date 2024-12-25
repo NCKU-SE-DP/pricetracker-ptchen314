@@ -9,6 +9,7 @@ from src.database import get_db
 from src.auth.models import authenticate_user, create_access_token, get_password_hash, get_current_user
 from src.auth.schemas import UserAuthSchema
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
@@ -52,10 +53,11 @@ async def login_for_access_token(
         logger.info(f"Successful login for user: {form_data.username}")
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content={
-                "status": "success",
-                "access_token": access_token,
-                "token_type": "bearer"
+            content={"status": "success",
+                    "data":{
+                        "access_token": access_token,
+                        "token_type": "bearer"
+                    }
             }
         )
     except SQLAlchemyError as db_error:
@@ -97,7 +99,14 @@ def create_user(user: UserAuthSchema, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_user)
         logger.info(f"Successfully registered new user: {user.username}")
-        return db_user
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"status": "success",
+                    "data":{
+                        "username": db_user.username
+                    }
+            }
+        )
     except Exception as e:
         logger.error(f"Registration error for {user.username}: {str(e)}")
         raise
@@ -106,7 +115,14 @@ def create_user(user: UserAuthSchema, db: Session = Depends(get_db)):
 def read_users_me(current_user: User = Depends(get_current_user)):
     try:
         logger.info(f"Profile access for user: {current_user.username}")
-        return {"username": current_user.username}
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"status": "success",
+                    "data":{
+                        "username": current_user.username
+                    }
+            }
+        )
     except Exception as e:
         logger.error(f"Profile access error for {current_user.username}: {str(e)}")
         raise 

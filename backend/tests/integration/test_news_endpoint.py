@@ -65,7 +65,7 @@ def test_articles():
             link="https://example.com/test-news-1",
             title="Test News 1",
             content="This is test content 1",
-            time=datetime.strptime("2024-01-01 12:00:00", "%Y-%m-%d %H:%M"),
+            time=datetime.strptime("2024-01-01 12:00", "%Y-%m-%d %H:%M"),
             summary="Test summary 1",
             reason="Test reason 1"
         )
@@ -74,7 +74,7 @@ def test_articles():
             link="https://example.com/test-news-2",
             title="Test News 2",
             content="This is test content 2",
-            time=datetime.strptime("2024-01-02 12:00:00", "%Y-%m-%d %H:%M"),
+            time=datetime.strptime("2024-01-02 12:00", "%Y-%m-%d %H:%M"),
             summary="Test summary 2",
             reason="Test reason 2"
         )
