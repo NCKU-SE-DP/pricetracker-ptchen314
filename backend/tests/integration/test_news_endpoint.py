@@ -62,18 +62,18 @@ def test_token(test_user):
 def test_articles():
     with next(override_get_db()) as db:
         article_1 = NewsArticle(
-            url="https://example.com/test-news-1",
+            link="https://example.com/test-news-1",
             title="Test News 1",
             content="This is test content 1",
-            time="2024-01-01",
+            time="2024-01-01 12:00",
             summary="Test summary 1",
             reason="Test reason 1"
         )
         article_2 = NewsArticle(
-            url="https://example.com/test-news-2",
+            link="https://example.com/test-news-2",
             title="Test News 2",
             content="This is test content 2",
-            time="2024-01-02",
+            time="2024-01-02 12:00",
             summary="Test summary 2",
             reason="Test reason 2"
         )
@@ -130,7 +130,7 @@ def test_search_news(mocker):
     
     mock_get = mocker.patch("src.crawler.udn_crawler.get_article_content", return_value={
         "title": "Test Title",
-        "time": "2024-09-10",
+        "time": "2024-09-10 12:00:00",
         "content": "This is a test paragraph."
     })
 
