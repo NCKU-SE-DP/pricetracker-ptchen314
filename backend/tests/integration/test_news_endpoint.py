@@ -12,7 +12,7 @@ from src.auth.models import pwd_context
 from unittest.mock import Mock
 import sys
 import os
-
+from datetime import datetime
 # 添加測試配置到 Python 路徑
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config import settings
@@ -65,7 +65,7 @@ def test_articles():
             link="https://example.com/test-news-1",
             title="Test News 1",
             content="This is test content 1",
-            time="2024-01-01 12:00:00",
+            time=datetime.strptime("2024-01-01 12:00:00", "%Y-%m-%d %H:%M"),
             summary="Test summary 1",
             reason="Test reason 1"
         )
@@ -74,7 +74,7 @@ def test_articles():
             link="https://example.com/test-news-2",
             title="Test News 2",
             content="This is test content 2",
-            time="2024-01-02 12:00:00",
+            time=datetime.strptime("2024-01-02 12:00:00", "%Y-%m-%d %H:%M"),
             summary="Test summary 2",
             reason="Test reason 2"
         )
