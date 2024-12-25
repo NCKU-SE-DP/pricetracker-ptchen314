@@ -168,7 +168,7 @@ async def search_news(
                         news_article = NewsArticle(
                             title=article_content["title"],
                             content=article_content["content"],
-                            time=datetime.strptime(article_content["time"], "%Y-%m-%d %H:%M:%S"),
+                            time=datetime.strptime(article_content["time"], "%Y-%m-%d %H:%M"),
                             link=news["titleLink"]
                         )
                         db.add(news_article)
@@ -221,10 +221,10 @@ def news_summary(
     
     try:
         summary_dict = json.loads(result.get("content", "{}"))
-        data = [{
+        data = {
             "summary": summary_dict["影響"],
             "reason": summary_dict["原因"]
-        }]
+        }
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={
