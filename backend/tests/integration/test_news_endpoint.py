@@ -131,7 +131,7 @@ def test_search_news(mocker):
     
     mock_get = mocker.patch("src.crawler.udn_crawler.get_article_content", return_value={
         "title": "Test Title",
-        "time": "2024-09-10 12:00:00",
+        "time": "2024-09-10 12:00",
         "content": "This is a test paragraph."
     })
 
