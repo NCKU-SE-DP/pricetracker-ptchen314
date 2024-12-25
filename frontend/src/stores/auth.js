@@ -32,9 +32,9 @@ export const useAuthStore = defineStore('auth', {
                     username: username,
                     password: password,
                 },
-                    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+                { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
                 );
-                this.accessToken = response.data.access_token;
+                this.accessToken = response.data.data.access_token;
                 localStorage.setItem('accessToken', this.accessToken);
                 axios.defaults.headers.common['Authorization'] = `Bearer ${this.accessToken}`;
                 await this.fetchUser();
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', {
         async fetchUser() {
             try {
                 const response = await axios.get('http://localhost:8000/api/v1/users/me');
-                this.user = response.data.username;
+                this.user = response.data.data.username;
                 this.errorMessage = '';
             } catch (error) {
                 this.logout();

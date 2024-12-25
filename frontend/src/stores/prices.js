@@ -24,8 +24,7 @@ export const usePricesStore = defineStore('prices', {
             });
             try {
                 const response = await axios.get('http://localhost:8000/api/v1/prices/necessities-price');
-                let data = response.data;
-
+                let data = response.data.data;
 
                 data.forEach(item => {
                     const categoryKey = Object.keys(Categories).find(
