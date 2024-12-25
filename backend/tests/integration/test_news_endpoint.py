@@ -65,15 +65,16 @@ def test_articles():
             link="https://example.com/test-news-1",
             title="Test News 1",
             content="This is test content 1",
-            time="2024-01-01 12:00",
+            time="2024-01-01 12:00:00",
             summary="Test summary 1",
             reason="Test reason 1"
         )
+
         article_2 = NewsArticle(
             link="https://example.com/test-news-2",
             title="Test News 2",
             content="This is test content 2",
-            time="2024-01-02 12:00",
+            time="2024-01-02 12:00:00",
             summary="Test summary 2",
             reason="Test reason 2"
         )
