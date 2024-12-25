@@ -50,7 +50,12 @@ async def bruh_general_exception_handler(request: Request, exc: Exception):
     logger.error(f"General error occurred: {str(exc)}", exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"message": "內部伺服器錯誤", "detail": str(exc)}
+        content={
+            "status": "error",
+            "message": "內部伺服器錯誤",
+            "detail": str(exc),
+            "path": str(request.url)
+        }
     )
 
 @app.exception_handler(ValueError)
@@ -58,7 +63,12 @@ async def bruh_value_error_handler(request: Request, exc: ValueError):
     logger.error(f"Value error occurred: {str(exc)}")
     return JSONResponse(
         status_code=400,
-        content={"message": "數值錯誤", "detail": str(exc)}
+        content={
+            "status": "error",
+            "message": "數值錯誤",
+            "detail": str(exc),
+            "path": str(request.url)
+        }
     )
 
 @app.exception_handler(KeyError)
@@ -66,7 +76,12 @@ async def bruh_key_error_handler(request: Request, exc: KeyError):
     logger.error(f"Key error occurred: {str(exc)}")
     return JSONResponse(
         status_code=400,
-        content={"message": "鍵值錯誤", "detail": str(exc)}
+        content={
+            "status": "error",
+            "message": "鍵值錯誤",
+            "detail": str(exc),
+            "path": str(request.url)
+        }
     )
 
 @app.exception_handler(TypeError)
@@ -74,7 +89,12 @@ async def bruh_type_error_handler(request: Request, exc: TypeError):
     logger.error(f"Type error occurred: {str(exc)}")
     return JSONResponse(
         status_code=400,
-        content={"message": "型別錯誤", "detail": str(exc)}
+        content={
+            "status": "error",
+            "message": "型別錯誤",
+            "detail": str(exc),
+            "path": str(request.url)
+        }
     )
 
 # Database error handler
@@ -84,7 +104,12 @@ async def bruh_database_error_handler(request: Request, exc: SQLAlchemyError):
     logger.error(f"Database error occurred: {str(exc)}")
     return JSONResponse(
         status_code=500,
-        content={"message": "資料庫錯誤", "detail": str(exc)}
+        content={
+            "status": "error",
+            "message": "資料庫錯誤",
+            "detail": str(exc),
+            "path": str(request.url)
+        }
     )
 
 # Register routers
