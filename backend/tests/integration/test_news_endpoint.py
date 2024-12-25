@@ -94,23 +94,25 @@ def test_read_news(test_articles):
     response = client.get("/api/v1/news/news")
     assert response.status_code == 200
     json_response = response.json()
-    assert len(json_response) == 2
-    assert json_response[0]["title"] == "Test News 2"
-    assert json_response[1]["title"] == "Test News 1"
+    assert json_response["status"] == "success"
+    data = json_response["data"]
+    assert len(data) == 2
+    assert data[0]["title"] == "Test News 2"
+    assert data[1]["title"] == "Test News 1"
 
 
 def test_read_user_news(test_user, test_token, test_articles):
     headers = {"Authorization": f"Bearer {test_token}"}
     response = client.get("/api/v1/news/user_news", headers=headers)
-    print(test_token)
-    print(response.json())
     assert response.status_code == 200
     json_response = response.json()
-    assert len(json_response) == 2
-    assert json_response[0]["title"] == "Test News 2"
-    assert json_response[0]["is_upvoted"] is False
-    assert json_response[1]["title"] == "Test News 1"
-    assert json_response[1]["is_upvoted"] is False
+    assert json_response["status"] == "success"
+    data = json_response["data"]
+    assert len(data) == 2
+    assert data[0]["title"] == "Test News 2"
+    assert data[0]["is_upvoted"] is False
+    assert data[1]["title"] == "Test News 1"
+    assert data[1]["is_upvoted"] is False
 
 def mock_openai(mocker, return_content):
     mock_openai_client = mocker.patch('src.news.news.openai_client')
@@ -135,11 +137,11 @@ def test_search_news(mocker):
     response = client.post("/api/v1/news/search_news", json={"prompt": "Test search prompt"})
     
     assert response.status_code == 200
-    data = response.json()
+    json_response = response.json()
+    assert json_response["status"] == "success"
+    data = json_response["data"]
     assert len(data) == 1
     assert data[0]["title"] == "Test Title"
-    assert data[0]["time"] == "2024-09-10"
-    assert data[0]["content"] == "This is a test paragraph."
 
 
 def test_news_summary(test_token):

@@ -66,7 +66,9 @@ def test_register_user():
     })
 
     assert response.status_code == 200
-    data = response.json()
+    json_response = response.json()
+    assert json_response["status"] == "success"
+    data = json_response["data"]
     assert data["username"] == "newuser"
 
 
@@ -77,7 +79,9 @@ def test_login_for_access_token(test_user):
     })
 
     assert response.status_code == 200
-    data = response.json()
+    json_response = response.json()
+    assert json_response["status"] == "success"
+    data = json_response["data"]
     assert "access_token" in data
     assert data["token_type"] == "bearer"
 
