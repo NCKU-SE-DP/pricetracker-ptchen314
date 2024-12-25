@@ -156,10 +156,10 @@ def test_news_summary(test_token):
 
     assert response.status_code == 200
     json_response = response.json()
-    assert "summary" in json_response
-    assert "reason" in json_response
-    assert isinstance(json_response["summary"], str)
-    assert isinstance(json_response["reason"], str)
+    assert "summary" in json_response["data"]
+    assert "reason" in json_response["data"]
+    assert isinstance(json_response["data"]["summary"], str)
+    assert isinstance(json_response["data"]["reason"], str)
 
 
 def test_upvote_article(test_user_and_articles, test_token):

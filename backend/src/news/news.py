@@ -93,7 +93,7 @@ def read_user_news(
                 "id": article.id,
                 "title": article.title,
                 "content": article.content,
-                "time": article.time,
+                "time": str(article.time),
                 "link": article.link,
                 "upvotes": upvotes,
                 "is_upvoted": upvoted
