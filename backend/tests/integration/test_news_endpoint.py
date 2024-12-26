@@ -12,7 +12,7 @@ from src.auth.models import pwd_context
 from unittest.mock import Mock
 import sys
 import os
-
+from datetime import datetime
 # 添加測試配置到 Python 路徑
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config import settings
@@ -62,18 +62,19 @@ def test_token(test_user):
 def test_articles():
     with next(override_get_db()) as db:
         article_1 = NewsArticle(
-            url="https://example.com/test-news-1",
+            link="https://example.com/test-news-1",
             title="Test News 1",
             content="This is test content 1",
-            time="2024-01-01",
+            time=datetime.strptime("2024-01-01 12:00", "%Y-%m-%d %H:%M"),
             summary="Test summary 1",
             reason="Test reason 1"
         )
+
         article_2 = NewsArticle(
-            url="https://example.com/test-news-2",
+            link="https://example.com/test-news-2",
             title="Test News 2",
             content="This is test content 2",
-            time="2024-01-02",
+            time=datetime.strptime("2024-01-02 12:00", "%Y-%m-%d %H:%M"),
             summary="Test summary 2",
             reason="Test reason 2"
         )
@@ -94,23 +95,25 @@ def test_read_news(test_articles):
     response = client.get("/api/v1/news/news")
     assert response.status_code == 200
     json_response = response.json()
-    assert len(json_response) == 2
-    assert json_response[0]["title"] == "Test News 2"
-    assert json_response[1]["title"] == "Test News 1"
+    assert json_response["status"] == "success"
+    data = json_response["data"]
+    assert len(data) == 2
+    assert data[0]["title"] == "Test News 2"
+    assert data[1]["title"] == "Test News 1"
 
 
 def test_read_user_news(test_user, test_token, test_articles):
     headers = {"Authorization": f"Bearer {test_token}"}
     response = client.get("/api/v1/news/user_news", headers=headers)
-    print(test_token)
-    print(response.json())
     assert response.status_code == 200
     json_response = response.json()
-    assert len(json_response) == 2
-    assert json_response[0]["title"] == "Test News 2"
-    assert json_response[0]["is_upvoted"] is False
-    assert json_response[1]["title"] == "Test News 1"
-    assert json_response[1]["is_upvoted"] is False
+    assert json_response["status"] == "success"
+    data = json_response["data"]
+    assert len(data) == 2
+    assert data[0]["title"] == "Test News 2"
+    assert data[0]["is_upvoted"] is False
+    assert data[1]["title"] == "Test News 1"
+    assert data[1]["is_upvoted"] is False
 
 def mock_openai(mocker, return_content):
     mock_openai_client = mocker.patch('src.news.news.openai_client')
@@ -128,18 +131,18 @@ def test_search_news(mocker):
     
     mock_get = mocker.patch("src.crawler.udn_crawler.get_article_content", return_value={
         "title": "Test Title",
-        "time": "2024-09-10",
+        "time": "2024-09-10 12:00",
         "content": "This is a test paragraph."
     })
 
     response = client.post("/api/v1/news/search_news", json={"prompt": "Test search prompt"})
     
     assert response.status_code == 200
-    data = response.json()
+    json_response = response.json()
+    assert json_response["status"] == "success"
+    data = json_response["data"]
     assert len(data) == 1
     assert data[0]["title"] == "Test Title"
-    assert data[0]["time"] == "2024-09-10"
-    assert data[0]["content"] == "This is a test paragraph."
 
 
 def test_news_summary(test_token):
@@ -153,10 +156,10 @@ def test_news_summary(test_token):
 
     assert response.status_code == 200
     json_response = response.json()
-    assert "summary" in json_response
-    assert "reason" in json_response
-    assert isinstance(json_response["summary"], str)
-    assert isinstance(json_response["reason"], str)
+    assert "summary" in json_response["data"]
+    assert "reason" in json_response["data"]
+    assert isinstance(json_response["data"]["summary"], str)
+    assert isinstance(json_response["data"]["reason"], str)
 
 
 def test_upvote_article(test_user_and_articles, test_token):

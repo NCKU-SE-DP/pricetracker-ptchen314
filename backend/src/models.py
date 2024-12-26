@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, Text, DateTime
 from sqlalchemy.orm import relationship
 from src.database import Base
 
@@ -22,13 +22,27 @@ class User(Base):
 
 class NewsArticle(Base):
     __tablename__ = "news_articles"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    url = Column(String, unique=True, nullable=False)
-    title = Column(String, nullable=False)
-    time = Column(String, nullable=False)
-    content = Column(Text, nullable=False)
-    summary = Column(Text, nullable=False)
-    reason = Column(Text, nullable=False)
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String)
+    content = Column(String)
+    time = Column(DateTime)
+    link = Column(String)
+    summary = Column(Text)
+    reason = Column(Text)
+
+    def to_dict(self):
+        """將模型轉換為可序列化的字典"""
+        return {
+            "id": self.id,
+            "title": self.title,
+            "content": self.content,
+            "time": self.time.isoformat() if self.time else None,
+            "link": self.link,
+            "summary": self.summary,
+            "reason": self.reason
+        }
+
     upvoted_by_users = relationship(
         "User", 
         secondary=user_news_association_table, 
